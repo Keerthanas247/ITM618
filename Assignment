@@ -1,0 +1,145 @@
+# Opening file
+import pandas as pd
+df = pd.read_csv("CreditData.csv")
+df
+
+df.dtypes
+
+print('uniue values of the target attribute (Approved):', df.Approved.unique())
+
+# create a new column for target attribute
+df['Approved_val'] = df['Approved']
+# manually assing 1/0 to Yes/No
+df['Approved_val'] = df['Approved_val'].map({'Yes': 1, 'No': 0})
+
+categorical_columns = df.select_dtypes(include=['object']).columns
+print(categorical_columns)
+# This shows Status,history,Purpose,Savings,employment,sex,guarantors,Property,OtherInstallment,Housing,Job,Telephone,foreign,Approved are categorial.
+
+#First, check unique values of status
+print('unique values of attribute :', df.Status.unique())
+df['Status_val'] = df['Status']
+df['Status_val'] = df['Status_val'].map({'A11': 0, 'A12': 1, 'A13' : 2, 'A14' : 3})
+
+print('unique values of attribute :', df.history.unique())
+
+df['history_val'] = df['history']
+df['history_val'] = df['history_val'].map({'A30': 0, 'A31': 1, 'A32' : 2, 'A33' : 3, 'A34' : 4})
+df
+
+print('unique values of attribute Purpose:', df.Purpose.unique())
+df['Purpose_val'] = df['Purpose']
+df['Purpose_val'] = df['Purpose_val'].map({'A40' : 0, 'A41' : 1, 'A42' : 2, 'A43' : 3, 'A44' : 4, 'A45' : 5, 'A46' : 6, 'A47' : 7, 'A48' : 8, 'A49' : 9, 'A410' : 10})
+df
+
+print('unique values of attribute :', df.Savings.unique())
+
+df['Savings_val'] = df['Savings']
+df['Savings_val'] = df['Savings_val'].map({'A61': 0, 'A62': 1, 'A63' : 2, 'A64' : 3, 'A65' : 4})
+df
+
+print('unique values of attribute :', df.employment.unique())
+
+df['employment_val'] = df['employment']
+df['employment_val'] = df['employment_val'].map({'A71': 0, 'A72': 1, 'A73' : 2, 'A74' : 3, 'A75' : 4})
+df
+
+
+print('unique values of attribute :', df.sex.unique())
+
+df['sex_val'] = df['sex']
+df['sex_val'] = df['sex_val'].map({'A91': 0, 'A92': 1, 'A93' : 2, 'A94' : 3})
+df
+
+print('unique values of attribute :', df.guarantors.unique())
+
+df['guarantors_val'] = df['guarantors']
+df['guarantors_val'] = df['guarantors'].map({'A101': 0, 'A102': 1, 'A103' : 2})
+df
+
+print('unique values of attribute :', df.Property.unique())
+
+df['Property_val'] = df['Property']
+df['Property_val'] = df['Property_val'].map({'A121': 0, 'A122': 1, 'A123' : 2, 'A124' : 3})
+df
+print('unique values of attribute :', df.OtherInstallment.unique())
+
+df['OtherInstallment_val'] = df['OtherInstallment']
+df['OtherInstallment_val'] = df['OtherInstallment_val'].map({'A141': 0, 'A142': 1, 'A143' : 2})
+df
+print('unique values of attribute :', df.Housing.unique())
+df['Housing_val'] = df ['Housing']
+df['Housing_val'] = df['Housing_val'].map({'A151' : 0, 'A152' : 1, 'A153' : 2})
+df
+
+print('unique values of attribute :', df.Job.unique())
+
+df['Job_val'] = df ['Job']
+df['Job_val'] = df['Job_val'].map({'A171' : 0, 'A172' : 1, 'A173' : 2, 'A174' : 3})
+df
+
+print('unique values of attribute :', df.Telephone.unique())
+
+df['Telephone_val'] = df ['Telephone']
+df['Telephone_val'] = df['Telephone_val'].map({'A191' : 0, 'A192' : 1})
+df
+print('unique values of attribute :', df.foreign.unique())
+
+df['foreign_val'] = df ['foreign']
+df['foreign_val'] = df['foreign_val'].map({'A201' : 0, 'A202' : 1})
+df
+
+# list of current  columns
+df.columns
+
+from sklearn.model_selection import train_test_split
+
+all_y = df['Approved_val']
+
+all_X = df[['Status_val', 'Duration', 'history_val', 'Purpose_val', 'Savings_val', 'employment_val', 'Installment', 'sex_val', 'guarantors_val', 'residence', 'Property_val', 'ExistingCredits', 'Age', 'OtherInstallment_val', 'Housing_val', 'ExistingCredits', 'Job_val', 'liable', 'Telephone_val', 'foreign_val']]
+
+#80% training set and 20% test set
+train_X, test_X, train_y, test_y = train_test_split(all_X, all_y, test_size=0.2, random_state=42)
+
+print('length of train:', len(train_X))
+print('length of test:', len(test_X))
+
+from sklearn import tree
+tree1 = tree.DecisionTreeClassifier(max_depth=6, max_leaf_nodes=10,)
+tree1.fit(train_X,train_y)
+
+predictions = tree1.predict(test_X)
+
+from sklearn.metrics import accuracy_score
+print(accuracy_score(test_y, predictions))
+
+predictions = tree1.predict(test_X)
+
+from sklearn.metrics import recall_score
+print(recall_score(test_y, predictions))
+
+tree.plot_tree(tree1)
+#Create Decision tree
+
+#create confusion matrix
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(test_y, predictions)
+
+print("Confusion Matrix:")
+print(cm)
+
+tn, fp, fn, tp = cm.ravel()
+
+# Calculate accuracy
+accuracy = (tp + tn) / (tp + tn + fp + fn)
+
+# Calculate precision
+precision = tp / (tp + fp)
+
+# Calculate recall
+recall = tp / (tp + fn)
+
+# Display the results
+print(f'Accuracy: {accuracy:.4f}')
+print(f'Precision: {precision:.4f}')
+print(f'Recall: {recall:.4f}')
